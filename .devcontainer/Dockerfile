@@ -27,16 +27,6 @@ RUN apt-get update && apt-get install -y \
 # Install Marp CLI globally
 RUN npm install -g @marp-team/marp-cli
 
-# Install MongoDB
-RUN apt-get update && apt-get install -y \
-    mongodb \
-    mongodb-database-tools \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create MongoDB data directory
-RUN mkdir -p /data/db && \
-    chmod -R 777 /data/db
-
 # Install additional system utilities
 RUN apt-get update && apt-get install -y \
     git \
@@ -60,24 +50,19 @@ ENV PYTHONUNBUFFERED=1 \
     NODE_ENV=production
 
 # Expose ports for development
-EXPOSE 8000 27017 3000
+EXPOSE 8000 3000
 
 # Create a startup script for the container
 RUN echo '#!/bin/bash\n\
 set -e\n\
-echo "🚀 Django + MongoDB Workshop Container Started"\n\
+echo "🚀 Django + MongoDB Atlas Workshop Container Started"\n\
 \n\
 # Create .env if it doesn'\''t exist\n\
 if [ ! -f .env ]; then\n\
     echo "📝 Creating .env file from template..."\n\
     cp .env.example .env\n\
+    echo "⚠️  Please configure MONGODB_URI in .env with your MongoDB Atlas connection string"\n\
 fi\n\
-\n\
-# Start MongoDB in the background\n\
-echo "🗄️  Starting MongoDB..."\n\
-mkdir -p /data/db /tmp/mongodb\n\
-mongod --dbpath /data/db --logpath /tmp/mongodb/mongod.log --fork || true\n\
-sleep 2\n\
 \n\
 echo "✅ Container ready!"\n\
 echo ""\n\
@@ -85,6 +70,11 @@ echo "💡 Quick commands:"\n\
 echo "   python manage.py runserver 0.0.0.0:8000"\n\
 echo "   python seed_data.py"\n\
 echo "   marp slides.md --html"\n\
+echo ""\n\
+echo "📖 MongoDB Atlas Setup:"\n\
+echo "   1. Create free cluster: https://account.mongodb.com/account"\n\
+echo "   2. Get connection string from Atlas"\n\
+echo "   3. Add it to .env as MONGODB_URI"\n\
 echo ""\n\
 echo "📖 Documentation:"\n\
 echo "   See README.md and START_HERE.md"\n\
