@@ -26,17 +26,6 @@ if [ ! -f .env ]; then
     echo "  💡 Tip: Update .env with your MongoDB Atlas connection string"
 fi
 
-# Verify MongoDB is running
-echo "🗄️  Checking MongoDB..."
-mkdir -p /data/db /tmp/mongodb
-if ! pgrep mongod > /dev/null; then
-    echo "  Starting MongoDB service..."
-    mongod --dbpath /data/db --logpath /tmp/mongodb/mongod.log --fork > /dev/null 2>&1 || echo "  MongoDB starting in background"
-    sleep 2
-else
-    echo "  ✓ MongoDB is already running"
-fi
-
 # Verify Marp CLI is available
 echo "🎨 Checking Marp CLI..."
 if command -v marp &> /dev/null; then
