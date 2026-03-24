@@ -77,9 +77,9 @@ All files have been created and configured for a professional 1-hour workshop.
 
 **What Gets Installed Automatically:**
 
-- Python 3.11
-- Django 5.0.0
-- django-mongodb-backend 3.0.0
+- Python
+- Django
+- django-mongodb-backend
 - MongoDB local instance
 - Git tools
 - VS Code extensions
@@ -213,9 +213,9 @@ workshop/
 
 | Component | Technology | Version | Purpose |
 |-----------|------------|---------|---------|
-| **Framework** | Django | 5.0.0 | Web framework |
+| **Framework** | Django | Latest | Web framework |
 | **Database** | MongoDB | Latest | NoSQL database |
-| **ORM** | django-mongodb-backend | 3.0.0 | MongoDB backend for Django |
+| **ORM** | django-mongodb-backend | Latest | MongoDB backend for Django |
 | **Environment** | Docker | Latest | Codespace container |
 | **Python** | Python | 3.11 | Programming language |
 | **API Format** | REST/JSON | - | Data exchange |

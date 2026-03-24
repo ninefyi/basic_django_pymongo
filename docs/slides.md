@@ -67,18 +67,18 @@ venv\Scripts\activate
 
 # 4. Create requirements.txt with dependencies
 cat > requirements.txt << 'EOF'
-Django==5.0.0
-django-mongodb-backend==3.0.0
-pymongo==4.6.1
-python-dotenv==1.0.0
+Django
+django-mongodb-backend
+pymongo
+python-dotenv
 EOF
 
 # 5. Install dependencies
 pip install -r requirements.txt
 
 # Verify installation
-python --version  # Should show 3.9+
-django-admin --version  # Should show 5.0.0
+python --version
+django-admin --version
 ```
 
 ### Step 2: Create MongoDB Atlas Connection
@@ -145,9 +145,9 @@ blog-project/
 
 ### What Gets Installed?
 
-- **Django 5.0.0** — Web framework
-- **django-mongodb-backend 3.0.0** — ORM bridge for MongoDB
-- **pymongo 4.6.1** — MongoDB Python driver
+- **Django** — Web framework
+- **django-mongodb-backend** — ORM bridge for MongoDB
+- **pymongo** — MongoDB Python driver
 - **python-dotenv** — Load environment variables from .env
 
 ---

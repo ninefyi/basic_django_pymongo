@@ -58,6 +58,6 @@
     }
   },
 
-  "forwardPorts": [8000, 27017, 3000],
+  "forwardPorts": [8000, 3000],
   "waitFor": "onCreateCommand"
 }
