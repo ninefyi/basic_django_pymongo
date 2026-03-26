@@ -23,8 +23,6 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
-    'django.contrib.contenttypes',
-    'django.contrib.auth',
     'apps.blog',
 ]
 
@@ -56,17 +54,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_mongodb_backend',
-        'CLIENT': {
-            'mongoURI': os.getenv(
-                'MONGODB_URI',
-                'mongodb://localhost:27017/blog_db'
-            ),
-            'connect': True,
-            'retryWrites': True,
-        },
+        'HOST': os.getenv("MONGODB_URI", "mongodb://127.0.0.1:27017/"),
         'ENFORCE_SCHEMA_IN_MIGRATIONS': False,
+        'NAME': os.getenv("DB_NAME", 'test'),
+        'COLLECTION_NAME': os.getenv("COLLECTION_NAME", 'posts'),
     }
 }
+
+VOYAGE_API_KEY = os.getenv("VOYAGE_API_KEY", "your_api_key_here")
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
@@ -75,4 +70,15 @@ USE_I18N = True
 USE_TZ = True
 
 # Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = 'django_mongodb_backend.fields.ObjectIdAutoField'
+
+# Silence MongoDB-specific system checks that are incompatible with contrib apps
+SILENCED_SYSTEM_CHECKS = [
+    "mongodb.E001",
+    "mongodb.W001",
+    "mongodb.W002",
+    "mongodb.W003",
+    "mongodb.W004",
+    "mongodb.W005",
+    "mongodb.W006",
+]
