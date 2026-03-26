@@ -1,6 +1,7 @@
 """Blog views for CRUD operations using Django ORM."""
 
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ObjectDoesNotExist
 import json
@@ -59,17 +60,28 @@ def create_post(request):
         }, status=500)
 
 
-@require_http_methods(["GET"])
+@require_http_methods(["GET", "POST"])
 def list_posts(request):
     """
     READ: Get all blog posts from MongoDB.
+    POST: Create a new blog post.
     
-    Query parameters:
+    GET Query parameters:
     - author: Filter by author name (optional)
     - limit: Number of posts to return (optional, default: 50)
+
+    POST Expected JSON body:
+    {
+        "title": "My First Post",
+        "content": "Hello world...",
+        "author": "Alice"  (optional, defaults to "Anonymous")
+    }
     
-    Returns: JSON list of all posts
+    Returns: JSON list of all posts (GET) or created post (POST)
     """
+    if request.method == "POST":
+        return create_post(request)
+    
     try:
         # Get query parameters
         author = request.GET.get('author')
@@ -100,25 +112,25 @@ def list_posts(request):
         }, status=500)
 
 
-@require_http_methods(["GET"])
+@require_http_methods(["GET", "PUT", "DELETE"])
 def get_post(request, post_id):
     """
-    READ: Get a single blog post by ID.
+    GET: Get a single blog post by ID.
+    PUT: Update an existing blog post.
+    DELETE: Remove a blog post.
     
     URL parameter:
-    - post_id: MongoDB ObjectId or Django primary key of the post
+    - post_id: MongoDB ObjectId of the post
     
-    Returns: JSON with the post details
+    Returns: JSON with the post details (GET), updated post (PUT), or confirmation (DELETE)
     """
+    if request.method == "PUT":
+        return update_post(request, post_id)
+    if request.method == "DELETE":
+        return delete_post(request, post_id)
+    
     try:
-        # Try to find post by ID
-        try:
-            # Try converting to int first (if MongoDB backend uses numeric IDs)
-            post_id_converted = int(post_id)
-            post = Post.objects.get(pk=post_id_converted)
-        except (ValueError, ObjectDoesNotExist):
-            # If not a number or not found, try as string (ObjectId)
-            post = Post.objects.get(pk=post_id)
+        post = Post.objects.get(pk=post_id)
         
         return JsonResponse({
             'status': 'success',
@@ -137,13 +149,12 @@ def get_post(request, post_id):
         }, status=500)
 
 
-@require_http_methods(["PUT"])
 def update_post(request, post_id):
     """
     UPDATE: Modify an existing blog post.
     
     URL parameter:
-    - post_id: MongoDB ObjectId or Django primary key of the post
+    - post_id: MongoDB ObjectId of the post
     
     Expected JSON body (all fields optional):
     {
@@ -158,12 +169,7 @@ def update_post(request, post_id):
         # Parse JSON from request body
         data = json.loads(request.body)
         
-        # Try to find post by ID
-        try:
-            post_id_converted = int(post_id)
-            post = Post.objects.get(pk=post_id_converted)
-        except (ValueError, ObjectDoesNotExist):
-            post = Post.objects.get(pk=post_id)
+        post = Post.objects.get(pk=post_id)
         
         # Update fields if provided
         if 'title' in data:
@@ -199,24 +205,17 @@ def update_post(request, post_id):
         }, status=500)
 
 
-@require_http_methods(["DELETE"])
 def delete_post(request, post_id):
     """
     DELETE: Remove a blog post from MongoDB.
     
     URL parameter:
-    - post_id: MongoDB ObjectId or Django primary key of the post
+    - post_id: MongoDB ObjectId of the post
     
     Returns: JSON confirmation of deletion
     """
     try:
-        # Try to find and delete post by ID
-        try:
-            post_id_converted = int(post_id)
-            post = Post.objects.get(pk=post_id_converted)
-        except (ValueError, ObjectDoesNotExist):
-            post = Post.objects.get(pk=post_id)
-        
+        post = Post.objects.get(pk=post_id)
         post.delete()
         
         return JsonResponse({
@@ -243,4 +242,9 @@ def health_check(request):
         'status': 'success',
         'message': 'Blog API is running!'
     })
+
+
+def crud_ui(request):
+    """Render the CRUD UI template."""
+    return render(request, 'blog/index.html')
 

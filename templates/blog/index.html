@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog CRUD UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1em;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .post-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .post-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .post-item.selected {
+            background: #e7f0ff;
+            border-left-color: #764ba2;
+        }
+
+        .post-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .post-author {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .post-date {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .post-content {
+            grid-column: 1 / -1;
+        }
+
+        .post-content h2 {
+            margin-bottom: 20px;
+        }
+
+        .post-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .detail-row {
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        .detail-value {
+            color: #333;
+            word-break: break-word;
+            text-align: left;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-row button {
+            flex: 1;
+        }
+
+        button[type="submit"] {
+            flex: 1;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .post-content {
+                grid-column: 1;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Blog CRUD</h1>
+            <p>Create, Read, Update, and Delete blog posts</p>
+        </header>
+
+        <div class="content">
+            <!-- Create/Update Form -->
+            <div class="card">
+                <h2 id="formTitle">Create New Post</h2>
+                <div id="formAlert" class="alert"></div>
+                <form id="postForm">
+                    <div class="form-group">
+                        <label for="title">Title *</label>
+                        <input type="text" id="title" name="title" placeholder="Enter post title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="content">Content *</label>
+                        <textarea id="content" name="content" placeholder="Enter post content" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Author (optional)</label>
+                        <input type="text" id="author" name="author" placeholder="Enter author name">
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" id="submitBtn">Create Post</button>
+                        <button type="button" id="resetBtn" class="btn-secondary">Clear</button>
+                        <button type="button" id="cancelBtn" class="btn-secondary" style="display: none;">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Posts List -->
+            <div class="card">
+                <h2>Posts List</h2>
+                <div id="listAlert" class="alert"></div>
+                <button id="refreshBtn" style="margin-bottom: 15px; width: 100%;">🔄 Refresh Posts</button>
+                <div id="postsList" class="posts-list">
+                    <div class="loading">Loading posts...</div>
+                </div>
+            </div>
+
+            <!-- Post Details -->
+            <div class="card post-content">
+                <h2>Post Details</h2>
+                <div id="detailAlert" class="alert"></div>
+                <div id="postDetailsContainer" class="empty-state">
+                    Click on a post to view details
+                </div>
+                <div id="actionButtons" class="button-row" style="display: none; gap: 10px; margin-top: 20px;">
+                    <button id="editBtn" class="btn-success">✏️ Edit This Post</button>
+                    <button id="deleteBtn" class="btn-danger">🗑️ Delete This Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Confirm Delete</span>
+                <button type="button" class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button type="button" class="btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+        let selectedPostId = null;
+        let isEditing = false;
+        let postsCache = {};  // Store posts by ID for easy lookup
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPosts();
+            document.getElementById('postForm').addEventListener('submit', handleFormSubmit);
+            document.getElementById('refreshBtn').addEventListener('click', loadPosts);
+            document.getElementById('resetBtn').addEventListener('click', resetForm);
+            document.getElementById('cancelBtn').addEventListener('click', cancelEdit);
+            document.getElementById('deleteBtn').addEventListener('click', () => {
+                if (selectedPostId) {
+                    document.getElementById('deleteModal').classList.add('show');
+                }
+            });
+            document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
+        });
+
+        function showAlert(elementId, message, type = 'success') {
+            const alertEl = document.getElementById(elementId);
+            alertEl.textContent = message;
+            alertEl.className = `alert show alert-${type}`;
+            if (type === 'success') {
+                setTimeout(() => alertEl.classList.remove('show'), 5000);
+            }
+        }
+
+        function loadPosts() {
+            fetch(`${API_URL}/posts/`)
+                .then(res => res.json())
+                .then(data => {
+                    const listEl = document.getElementById('postsList');
+                    postsCache = {};  // Clear cache
+                    
+                    if (data.count === 0) {
+                        listEl.innerHTML = '<div class="empty-state">No posts yet. Create one!</div>';
+                        return;
+                    }
+                    
+                    // Store posts in cache for quick lookup
+                    data.posts.forEach(post => {
+                        postsCache[post.id] = post;
+                    });
+                    
+                    listEl.innerHTML = data.posts.map(post => `
+                        <div class="post-item" onclick="selectPost('${post.id}', event)">
+                            <div class="post-title">${escapeHtml(post.title)}</div>
+                            <div class="post-author">by ${escapeHtml(post.author)}</div>
+                            <div class="post-date">${new Date(post.created_at).toLocaleDateString()}</div>
+                        </div>
+                    `).join('');
+                })
+                .catch(err => showAlert('listAlert', `Error loading posts: ${err.message}`, 'error'));
+        }
+
+        function selectPost(id, event) {
+            selectedPostId = id;
+            const post = postsCache[id];
+            
+            if (!post) {
+                showAlert('listAlert', 'Post not found', 'error');
+                return;
+            }
+            
+            document.querySelectorAll('.post-item').forEach(el => el.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            displayPostDetails(post);
+            scrollToDetails();
+        }
+
+        function displayPostDetails(post) {
+            const container = document.getElementById('postDetailsContainer');
+            container.innerHTML = `
+                <div class="post-details">
+                    <div class="detail-row">
+                        <div class="detail-label">Title</div>
+                        <div class="detail-value">${escapeHtml(post.title)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Author</div>
+                        <div class="detail-value">${escapeHtml(post.author)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Content</div>
+                        <div class="detail-value">${escapeHtml(post.content)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Created</div>
+                        <div class="detail-value">${new Date(post.created_at).toLocaleString()}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Updated</div>
+                        <div class="detail-value">${new Date(post.updated_at).toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Show action buttons
+            const actionButtons = document.getElementById('actionButtons');
+            actionButtons.style.display = 'flex';
+            document.getElementById('editBtn').addEventListener('click', () => editPost(post));
+        }
+
+        function editPost(post) {
+            isEditing = true;
+            selectedPostId = post.id;
+            document.getElementById('title').value = post.title;
+            document.getElementById('content').value = post.content;
+            document.getElementById('author').value = post.author;
+            document.getElementById('formTitle').textContent = 'Edit Post';
+            document.getElementById('submitBtn').textContent = 'Update Post';
+            document.getElementById('cancelBtn').style.display = 'inline-block';
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            resetForm();
+            isEditing = false;
+        }
+
+        function resetForm() {
+            document.getElementById('postForm').reset();
+            document.getElementById('formTitle').textContent = 'Create New Post';
+            document.getElementById('submitBtn').textContent = 'Create Post';
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.getElementById('actionButtons').style.display = 'none';
+            document.getElementById('postDetailsContainer').innerHTML = '<div class="empty-state">Click on a post to view details</div>';
+            selectedPostId = null;
+            isEditing = false;
+            document.getElementById('formAlert').classList.remove('show');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const formData = {
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value,
+                author: document.getElementById('author').value || 'Anonymous'
+            };
+
+            const method = isEditing ? 'PUT' : 'POST';
+            const url = isEditing ? `${API_URL}/posts/${selectedPostId}/` : `${API_URL}/posts/`;
+
+            fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showAlert('formAlert', isEditing ? 'Post updated successfully!' : 'Post created successfully!');
+                    resetForm();
+                    loadPosts();
+                } else {
+                    showAlert('formAlert', data.message, 'error');
+                }
+            })
+            .catch(err => showAlert('formAlert', `Error: ${err.message}`, 'error'));
+        }
+
+        function confirmDelete() {
+            fetch(`${API_URL}/posts/${selectedPostId}/`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    closeDeleteModal();
+                    if (data.status === 'success') {
+                        showAlert('listAlert', 'Post deleted successfully!');
+                        resetForm();
+                        document.getElementById('postDetailsContainer').innerHTML = '<div class="empty-state">Click on a post to view details</div>';
+                        document.getElementById('actionButtons').style.display = 'none';
+                        loadPosts();
+                    } else {
+                        showAlert('detailAlert', data.message, 'error');
+                    }
+                })
+                .catch(err => showAlert('detailAlert', `Error: ${err.message}`, 'error'));
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+        }
+
+        function scrollToDetails() {
+            document.querySelector('.post-content').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
