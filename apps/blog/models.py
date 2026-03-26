@@ -2,6 +2,8 @@
 
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser
+from django_mongodb_backend.fields import ObjectIdAutoField
 
 
 class Post(models.Model):
@@ -67,3 +69,12 @@ class Post(models.Model):
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
         }
+
+
+class User(AbstractUser):
+    """Custom User model that uses ObjectIdAutoField for MongoDB compatibility."""
+
+    id = ObjectIdAutoField(primary_key=True)
+
+    class Meta:
+        app_label = 'blog'

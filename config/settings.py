@@ -23,12 +23,21 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
-    'apps.blog',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'apps.blog',         # Must be LAST so BlogConfig.ready() runs after AuthConfig.ready()
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -42,6 +51,8 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -69,8 +80,18 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# Static files for Django admin and project assets.
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django_mongodb_backend.fields.ObjectIdAutoField'
+
+# Custom User model that uses ObjectIdAutoField for MongoDB compatibility
+AUTH_USER_MODEL = 'blog.User'
+
+# Use cookie-based sessions to avoid MongoDB pk conflict in session saves
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 # Silence MongoDB-specific system checks that are incompatible with contrib apps
 SILENCED_SYSTEM_CHECKS = [
