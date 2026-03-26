@@ -72,8 +72,6 @@ DATABASES = {
     }
 }
 
-VOYAGE_API_KEY = os.getenv("VOYAGE_API_KEY", "your_api_key_here")
-
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'

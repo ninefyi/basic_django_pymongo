@@ -29,7 +29,7 @@ serve:
 	python manage.py runserver 0.0.0.0:8000
 
 seed:
-	python scripts/seed_data.py
+	python manage.py ingest
 
 test:
 	python tests/test_api.py
